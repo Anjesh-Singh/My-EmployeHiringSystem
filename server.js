@@ -1,11 +1,23 @@
 const express = require('express');
-const bodyParser = require('body-parser');                //body-parser help to get access of data which send by user in body
-const app = express();
-require('dotenv').config;                                // to access env file
+const bodyParser = require('body-parser');
+require('dotenv').config();
+const authRoutes = require('./routes/auth.routes');
+const db = require('./models/index')
 
-app.use(bodyParser.urlencoded({ extended: true }));
+
+const app = express();
+
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
-app.listen(process.env.PORT, () => {                    // process.env.PORT  using process we select .env file and then we select PORT
-    console.log("Server Started")
+// register the routes
+authRoutes(app);
+
+if(process.env.SYNC){
+    db.sequelize.sync({force : true});
+}
+
+
+app.listen(process.env.PORT, () => {
+    console.log('Server Started at PORT', process.env.PORT);
 })
