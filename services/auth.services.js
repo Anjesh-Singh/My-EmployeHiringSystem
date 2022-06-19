@@ -1,6 +1,7 @@
 const { User } = require('../models/index');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+require('dotenv').config();
 
 //------------------------------------------------------------------------------------------------------
 
@@ -47,7 +48,7 @@ const checkPassword = (userPass, encryptPass) => {
 
 const creatToken = (user) => {
     try{
-        return jwt.sign(user, 'relevel', {
+        return jwt.sign(user, process.env.JWT_SECRET, {
             expiresIn: '2 days'
         })
     }
@@ -55,13 +56,36 @@ const creatToken = (user) => {
         console.log(err)
     }
 } 
+//------------------------------------------------------------------------------------------------------
 
+const verifyToken = async (token) => {
+    try{
+        const response = jwt.verify(token, process.env.JWT_SECRET);
+        return response;
+    }
+    catch(err){
+        console.log(err);
 
+    }
+}
+
+//------------------------------------------------------------------------------------------------------
+const getUserById = async (id) => {
+    try{
+        const user = await User.findByPK(id);
+        return user;
+    }
+    catch(err){
+        console.log(err)
+    }
+}
 
 
 module.exports = {
     signup,
     getUserByEmail,
     checkPassword,
-    creatToken
+    creatToken,
+    verifyToken,
+    getUserById
 }
